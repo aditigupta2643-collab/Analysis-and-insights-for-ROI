@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharma Campaign ROI Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f8f9fa; color: #333; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #2c3e50; font-size: 2.2em; }
+        .header p { color: #7f8c8d; font-size: 1.1em; }
+        
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid #3498db; text-align: center; }
+        .kpi-card h3 { color: #7f8c8d; font-size: 0.9em; text-transform: uppercase; margin-bottom: 10px; }
+        .kpi-card .value { font-size: 2.2em; font-weight: bold; color: #2c3e50; }
+        .kpi-card.green { border-top-color: #2ecc71; }
+        .kpi-card.orange { border-top-color: #e67e22; }
+        .kpi-card.purple { border-top-color: #9b59b6; }
+
+        .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        @media (max-width: 900px) { .chart-grid { grid-template-columns: 1fr; } }
+        .chart-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .chart-card h2 { font-size: 1.2em; color: #34495e; margin-bottom: 15px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; }
+        .chart-wrapper { position: relative; height: 300px; width: 100%; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Pharma Commercial ROI Dashboard</h1>
+        <p>Campaign Expenditure, Prescription Uplift & Return Analysis</p>
+    </div>
+
+    <!-- KPI Section -->
+    <div class="grid-container">
+        <div class="kpi-card">
+            <h3>Total Campaign Expenditure</h3>
+            <div class="value">₹ 71.2M</div>
+        </div>
+        <div class="kpi-card green">
+            <h3>Incremental Revenue</h3>
+            <div class="value">₹ 184.5M</div>
+        </div>
+        <div class="kpi-card orange">
+            <h3>Average ROI</h3>
+            <div class="value">159%</div>
+        </div>
+        <div class="kpi-card purple">
+            <h3>Avg Incremental TRx / HCP</h3>
+            <div class="value">+8.4</div>
+        </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="chart-grid">
+        <div class="chart-card">
+            <h2>ROI by Territory Region</h2>
+            <div class="chart-wrapper"><canvas id="regionRoiChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h2>Incremental TRx by Doctor Specialty</h2>
+            <div class="chart-wrapper"><canvas id="specialtyChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h2>Expenditure Breakdown by Channel</h2>
+            <div class="chart-wrapper"><canvas id="expenditureChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h2>Top Performing Campaign Combinations</h2>
+            <div class="chart-wrapper"><canvas id="campaignChart"></canvas></div>
+        </div>
+    </div>
+
+    <script>
+        Chart.defaults.font.family = "'Segoe UI', sans-serif";
+        Chart.defaults.color = '#555';
+
+        // 1. ROI by Region (Bar)
+        const ctx1 = document.getElementById('regionRoiChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['Tier-1', 'Tier-2', 'Metro', 'Rural'],
+                datasets: [{ label: 'ROI %', data: [185, 172, 142, 135], backgroundColor: ['#3498db', '#2ecc71', '#e67e22', '#9b59b6'], borderRadius: 4 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#eee' } } } }
+        });
+
+        // 2. Incremental TRx by Specialty (Horizontal Bar)
+        const ctx2 = document.getElementById('specialtyChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Diabetologist', 'Endocrinologist', 'Neurologist', 'General Physician', 'Cardiologist', 'Pulmonologist'],
+                datasets: [{ label: 'Avg Incremental TRx', data: [12, 10, 8, 7, 5, 4], backgroundColor: '#1abc9c', borderRadius: 4 }]
+            },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: '#eee' } } } }
+        });
+
+        // 3. Expenditure Breakdown (Doughnut)
+        const ctx3 = document.getElementById('expenditureChart').getContext('2d');
+        new Chart(ctx3, {
+            type: 'doughnut',
+            data: {
+                labels: ['MR In-Clinic Detailing', 'Digital CME Webinar', 'Doctor Starter Sampling Kits', 'Chemist POB Discount', 'Doctor Conference', 'Advisory Board'],
+                datasets: [{ data: [35, 25, 15, 12, 8, 5], backgroundColor: ['#3498db', '#9b59b6', '#1abc9c', '#e67e22', '#e74c3c', '#f1c40f'], borderWidth: 1 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 10 } } } }
+        });
+
+        // 4. Campaign Combinations ROI (Line)
+        const ctx4 = document.getElementById('campaignChart').getContext('2d');
+        new Chart(ctx4, {
+            type: 'line',
+            data: {
+                labels: ['MR + WhatsApp', 'MR + CME', 'MR + Sampling', 'MR + Chemist Disc', 'All Channels Combined'],
+                datasets: [{ label: 'ROI %', data: [210, 165, 190, 140, 110], borderColor: '#e74c3c', backgroundColor: 'rgba(231, 76, 60, 0.1)', fill: true, tension: 0.3 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#eee' } } } }
+        });
+    </script>
+</body>
+</html>
